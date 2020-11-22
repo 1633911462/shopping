@@ -63,6 +63,10 @@ export default {
     }
   },
   created () {
+    if (JSON.parse(atob(localStorage.userName)).user !== 'admin') {
+      this.$router.replace('/me')
+      return false
+    }
     this.getList()
   },
   methods: {

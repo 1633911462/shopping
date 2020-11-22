@@ -1,7 +1,7 @@
 var mixin = {
   data () {
     return {
-      ip: 'http://localhost:7000'
+      ip: 'http://175.24.126.252:7000'
     }
   },
   methods: {
