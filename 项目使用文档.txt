@@ -2,7 +2,7 @@
 npm install下载依赖。
 npm run serve允许项目
 默认的项目是使用我这边的后端接口
-	您也可以选择自行打开serve文件夹，用node执行index.jx文件,然后报错后，按要求安装模块就可以了。
-	然后在vue项目中的mixin.js文件里，将data里面的ip改成你这边的ip就可以了。
+	您也可以选择自行打开serve文件夹，将index.js文件里面的变量ImgIp的值改为自己的ip值就好了，然后用node执行index.jx文件,然后报错后，按要求安装模块就可以了。
+	最后在vue项目中的mixin.js文件里，将data里面的ip改成你这边的ip就可以了。
 
 后台管理账号：admin	密码：chiyu
