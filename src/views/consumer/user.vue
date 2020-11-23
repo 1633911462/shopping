@@ -17,6 +17,9 @@ export default {
     return {
     }
   },
+  created () {
+    this.getMe()
+  },
   watch: {
     // 监听路由变化
     $route: {

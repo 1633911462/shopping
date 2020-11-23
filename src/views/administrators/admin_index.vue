@@ -79,7 +79,7 @@ export default {
               num++
             }
           }
-          this.block[3].msg = num
+          this.block[2].msg = num
         })
     }
   }

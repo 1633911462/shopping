@@ -12,8 +12,8 @@ export default {
       this.axios.post(`${this.ip}/isUser`, JSON.parse(window.atob(localStorage.userName)))
         .then(async i => {
           if (i.data) {
-            console.log('自动登录成功')
             await this.getMe()
+            console.log('自动登录成功')
           } else {
             this.$router.push('/login')
             alert('密码已更改')

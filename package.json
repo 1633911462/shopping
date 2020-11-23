@@ -12,6 +12,7 @@
     "core-js": "^3.6.5",
     "element-ui": "^2.14.1",
     "mongodb": "^3.6.3",
+    "serve": "^11.3.2",
     "v-region": "^2.2.2",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
