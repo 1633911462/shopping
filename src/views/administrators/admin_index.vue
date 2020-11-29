@@ -65,6 +65,7 @@ export default {
   created () {
     if (JSON.parse(atob(localStorage.userName)).user !== 'admin') {
       this.$router.replace('/me')
+      alert('该账号暂无权限')
       return false
     }
     this.getList()

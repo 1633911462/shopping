@@ -106,6 +106,7 @@ export default {
       background: #fff;
       width: 80%;
       border-radius: 12px;
+      box-shadow: 0px 0px 2px 1px blue;
       margin: 1rem auto;
       padding: 0.5rem;
       min-height: 150px;

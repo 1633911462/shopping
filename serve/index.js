@@ -53,7 +53,7 @@ app.all('*',function (req, res, next) {
 		var time  = `${year}/${month}/${day} ${hour}:${minute}:${second}`
 		return time;
 	}
-   
+
 mongodb.connect(url,(err,client)=>{
 	if(err) throw err;
 	// 数据库连接成功!
@@ -91,7 +91,7 @@ mongodb.connect(url,(err,client)=>{
 		}else{
 		yzm.findOne({'user':msg.user},(err,i)=>{
 			if(i){
-				//验证码一样 
+				//验证码一样
 				if(i.code == msg.mailYzm){
 					var url  = null
 					if(req.file){
@@ -524,14 +524,14 @@ mongodb.connect(url,(err,client)=>{
 	// 删除购物车
 	app.post('/delGwc',(req,res)=>{
 		req.body.forEach((i,j) => {
-			gwc.deleteOne({_id:objectId(i._id)}, err => {
+			gwc.deleteOne({_id:objectId(i.id)}, err => {
 				if (parseInt(j+1) === req.body.length) {
 					res.send('ok')
 				}
 			})
 		})
 	})
-	// 查看我的购物车 
+	// 查看我的购物车
 	app.get('/gwc',async (req,res)=>{
 		var body = [];
 		var msg = gwc.find({user:req.query.user})
@@ -548,7 +548,7 @@ mongodb.connect(url,(err,client)=>{
 								msg = {...j}
 								msg.size = i.type
 								msg.num = i.num
-								msg._id = i._id
+								msg.id = i._id
 								msg.date = i.date
 								dp.findOne({user:msg.user},(err,k)=>{
 									if (k) {
@@ -625,9 +625,20 @@ mongodb.connect(url,(err,client)=>{
 		res.send(body)
 	})
 	// 添加订单
-	app.post('/addOrder',(req,res)=>{
+	app.post('/addOrder',async (req,res)=>{
 		var body = [];
 		for (i of req.body.list) {
+      let y = i.num;
+      await new Promise((resolve,reject)=>{
+        commodity.findOne({_id:objectId(i._id)},(err,j)=>{
+          let num = j.sales + y;
+          commodity.updateOne({_id:objectId(j._id)},{$set:{
+            sales: num
+          }},err=>{
+            resolve('1')
+          });
+        })
+      })
 			delete i._id
 			i.date = getTime()
 			i.address = req.body.address

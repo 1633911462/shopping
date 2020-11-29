@@ -35,7 +35,8 @@
         <div @click="result">结算</div>
       </div>
       <div class="f_r" v-if="this.update_ !== '管理'">
-        <span style="opacity:0;width: 7rem;">合计：￥{{count}}</span>
+        <p style="opacity:0;display:inline-block">合计：</p>
+        <span style="opacity:0;">￥{{count}}</span>
         <div @click="open">删除</div>
       </div>
     </div>
@@ -116,7 +117,7 @@ export default {
       this.timer = setTimeout(() => {
         this.axios.post(`${this.ip}/gwcNum`, {
           num: i.num,
-          _id: i._id
+          _id: i.id
         })
         this.timer = false
       }, 500)
