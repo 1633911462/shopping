@@ -1,11 +1,22 @@
 const express = require('express');
 const app = express();
+var server = require('http').Server(app);
+var io = require('socket.io')(server,{
+	cors: {
+    origin: "http://120.25.215.239/shopping",
+    methods: ["GET,HEAD,PUT,PATCH,POST,DELETE"],
+		preflightContinue: false,
+		allowedHeaders: ['my-custom-header'],
+    credentials: true
+  }
+});
+server.listen(7001);
 const mongodb = require('mongodb').MongoClient;
 const objectId = require('mongodb').ObjectId;
-const url = 'mongodb://127.0.0.1:27017';
+const url = 'mongodb://120.25.215.239:27017';
 const bodyParser = require('body-parser')
 const nodemail = require('./nodemailer.js')
-const Imgip = 'http://175.24.126.252:7000/uploads/'
+const Imgip = 'http://120.25.215.239/uploads/'
 app.use(bodyParser.json())
 app.use('/uploads',express.static(__dirname + '/uploads'))
 const multer = require('multer')
@@ -75,10 +86,16 @@ mongodb.connect(url,(err,client)=>{
 	const address = db.collection('address');
 	// 审核通知(店铺审核和商品审核)
 	const examine = db.collection('examine');
+	// 聊天记录
+	const chat = db.collection('chat');
 	// 注册用户
 	app.post('/addUser',upload.single('file'),(req,res)=>{
 		// 姓名、账号、密码、类型（默认消费者，可申请为商家）
 		var msg = JSON.parse(req.body.user)
+		if (msg.user === 'root') {
+			res.send('存在')
+			return false
+		}
 		user.findOne({'user': msg.user},(err,i)=>{
 			if(i){
 		// 账号已经存在
@@ -202,6 +219,9 @@ mongodb.connect(url,(err,client)=>{
 		user.findOne({user:req.body.user},(err,i)=>{
 			if(i){
 				// 获取成功
+				if (req.body.user === 'admin') {
+					i.gly = Imgip + '1.jpg'
+				}
 				res.send(i)
 			}else{
 				res.send(false)
@@ -323,9 +343,15 @@ mongodb.connect(url,(err,client)=>{
 	})
 	// 获取店铺信息
 	app.post('/myDp',(req,res)=>{
-		dp.findOne({user:req.body.user},(err,i)=>{
-			res.send(i)
-		})
+		if (req.body.user) {
+			dp.findOne({user:req.body.user},(err,i)=>{
+				res.send(i)
+			})
+		} else {
+			dp.findOne({dpName:req.body.dpName},(err,i)=>{
+				res.send(i)
+			})
+		}
 	})
 	// 粉丝增减
 	app.post('/fs',async (req,res)=>{
@@ -658,6 +684,139 @@ mongodb.connect(url,(err,client)=>{
 			body.push(i)
 		}, err => {
 			res.send(body)
+		})
+	})
+	// 聊天记录篇
+	io.on('connection', function (socket) {
+		// 初始化
+		socket.on('init',obj=>{
+			socket.join(obj.user)
+			if (obj.user === 'admin') {
+				socket.join('root')
+				let body3 = []
+				chat.find({readUser: 'root',read: false}).forEach(i => {
+					body3.push(i)
+				}, err => {
+					socket.emit('kefu',body3)
+				})
+			}
+			if (obj.dpName) {
+				socket.join(obj.dpName)
+				let body1 = []
+				chat.find({readUser: obj.dpName,read: false}).forEach(i => {
+					body1.push(i)
+				}, err => {
+					socket.emit('dpMsg',body1)
+				})
+			}
+			let body = []
+			chat.find({readUser: obj.user,read: false}).forEach(i => {
+				body.push(i)
+			}, err => {
+				socket.emit('userMsg',body)
+			})
+		})
+		// 给指定用户发送消息
+		socket.on('sendMsg',obj=>{
+			obj.msg.time = new Date().getTime()
+			obj.msg.read = false
+			obj.msg.readUser = obj.msg.tarUser
+			obj.msg.fsr = obj.msg.user
+			obj.msg.tp = Imgip + '1.jpg'
+			socket.in(obj.msg.tarUser).emit('msg', obj.msg)
+			chat.insert(obj.msg)
+			if (obj.msg.tarUser === 'root') {
+				setTimeout(()=>{
+					chat.findOne(obj.msg, (err,data) => {
+						if (data) {
+							let yx = {
+								from: '1633911462@qq.com',
+								subject: '网站 http://120.25.215.239/shopping/ 有新的消息',
+								to: '1633911462@qq.com',
+								text: '管理员用户，你好，网站 http://120.25.215.239/shopping/ 有新的消息，用户' + obj.msg.user + '发送的！'
+							};
+							nodemail(yx)
+						}
+					})
+				},300000)
+			} else {
+				if (!obj.msg.dp && obj.msg.user !== 'root') {
+					dp.findOne({dpName:obj.msg.tarUser}, (err,data) => {
+						if (data) {
+							user.findOne({user:data.user}, (err,mail) => {
+								setTimeout(()=>{
+									chat.findOne(obj.msg, (err,data) => {
+										if (data) {
+											let yx = {
+												from: '1633911462@qq.com',
+												subject: '网站 http://120.25.215.239/shopping/ 有新的消息',
+												to: data.mail,
+												text: '网站 http://120.25.215.239/shopping/ 有新的消息，用户' + obj.msg.user + '发送的！'
+											};
+											nodemail(yx)
+										}
+									})
+								},300000)
+							})
+						}
+					})
+				} else {
+					user.findOne({user:obj.msg.tarUser}, (err,data) => {
+						setTimeout(()=>{
+							chat.findOne(obj.msg, (err,msg) => {
+								if (msg) {
+									let yx = {
+										from: '1633911462@qq.com',
+										subject: '网站 http://120.25.215.239/shopping/ 有新的消息',
+										to: data.mail,
+										text: '网站 http://120.25.215.239/shopping/ 有新的消息，用户' + obj.msg.user + '发送的！'
+									};
+									nodemail(yx)
+								}
+							})
+						},10000)
+					})
+				}
+			}
+		})
+	});
+	// 获取当前用户的聊天列表
+	app.post('/chatList',(req,res)=>{
+		let body = []
+		chat.find({user:req.body.user}).forEach(i => {
+			body.push(i)
+		},err => {
+			chat.find({tarUser:req.body.user}).forEach(i => {
+				body.push(i)
+			},err => {
+				body.sort((a,b)=>{
+					return b.time - a.time
+				})
+				res.send(body)
+			})
+		})
+	})
+	// 获取与该用户的聊天记录
+	app.post('/chat',(req,res)=>{
+		let body = []
+		chat.find({user:req.body.user,tarUser:req.body.tarUser}).forEach(i => {
+			body.push(i)
+		},err => {
+			chat.find({user:req.body.tarUser,tarUser:req.body.user}).forEach(i => {
+				body.push(i)
+			},err => {
+				body.sort((a,b)=>{
+					return a.time - b.time
+				})
+				chat.updateMany({
+					read: false,
+					readUser: req.body.user,
+					fsr: req.body.tarUser
+				},{$set:{
+					read: true
+				}})
+				res.send(body)
+			})
 		})
 	})
 })

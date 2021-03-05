@@ -11,7 +11,7 @@
     </div>
     <div class="gm">
       <router-link :to="'/dpIndex/' + msg.user"><div style="color: #000;">店铺</div></router-link>
-      <div>客服</div>
+      <div @click="$router.push(`/chat?user=${msg.dpName}`)">客服</div>
       <div @click="yes">购物车</div>
       <div @click="yes(1)">立即购买</div>
     </div>
@@ -232,8 +232,7 @@ export default {
     display: flex;
     img{
       flex:0 0 100%;
-      // width:100%;
-      // height: 100%;
+      /* object-fit: contain; */
     }
     .index{
       position: absolute;

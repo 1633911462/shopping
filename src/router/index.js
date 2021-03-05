@@ -1,5 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+
+// 聊天界面
+import chat from '@/components/consumer/chat.vue'
 // 用户
 import user from '@/views/consumer/user.vue'
 import me from '@/components/consumer/me.vue'
@@ -19,6 +22,7 @@ import business from '@/views/business/index.vue'
 import mySp from '@/components/business/mySp.vue'
 import follow from '@/views/business/follow.vue'
 import shopOrder from '@/views/business/shopOrder.vue'
+import dpMsg from '@/components/business/dpMsg.vue'
 // 申请成为商家
 import apply from '@/views/business/apply.vue'
 // 管理员
@@ -27,6 +31,7 @@ import adminIndex from '@/views/administrators/admin_index.vue'
 import dp from '@/views/administrators/dp.vue'
 import rootOrder from '@/views/administrators/rootOrder.vue'
 import userList from '@/views/administrators/user.vue'
+import service from '@/components/administrators/msg.vue'
 // 登录注册
 import login from '@/views/login.vue'
 // 重置密码
@@ -61,6 +66,11 @@ const routes = [
         component: msg
       }
     ]
+  },
+  {
+    path: '/chat',
+    name: '聊天',
+    component: chat
   },
   {
     path: '/sp/:id',
@@ -123,6 +133,11 @@ const routes = [
     component: mySp
   },
   {
+    path: '/dpMsg',
+    name: '店铺消息',
+    component: dpMsg
+  },
+  {
     path: '/apply',
     name: '申请成功商家',
     component: apply
@@ -138,9 +153,14 @@ const routes = [
     component: rootOrder
   },
   {
-    path: '/dpMsg',
+    path: '/dpSh',
     name: '店铺审核',
     component: dp
+  },
+  {
+    path: '/service',
+    name: '客服',
+    component: service
   },
   {
     path: '/userList',
@@ -160,7 +180,8 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  routes
+  routes,
+  mode: 'history'
 })
 router.beforeEach((to, from, next) => {
   // 返回到登录页面时

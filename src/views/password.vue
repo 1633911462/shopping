@@ -90,7 +90,6 @@ export default {
             mailYzm: this.mailYzm
           })
             .then(i => {
-              console.log(i.data)
               if (i.data === '成功') {
                 alert('修改成功')
                 this.user = ''

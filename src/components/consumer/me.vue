@@ -10,17 +10,19 @@
       <div class="blo">我的关注</div>
     </router-link>
     <router-link to="/business">
-      <div class="blo">我的店铺</div>
+      <div class="blo">我的店铺<p class="right" v-if="dpMsg">{{dpMsg}}</p></div>
     </router-link>
     <router-link to="/address">
       <div class="blo">收货地址</div>
     </router-link>
+    <router-link to='/chat?root=true'>
     <div class="blo">联系客服</div>
+    </router-link>
     <router-link :to="'/history/' + this.$store.state.me._id">
       <div class="blo">足迹</div>
     </router-link>
     <router-link to="/adminIndex">
-      <div class="blo">管理员入口</div>
+      <div class="blo">管理员入口<p class="right" v-if="kefuMsg">{{kefuMsg}}</p></div>
     </router-link>
     <router-link to="/login">
       <div class="blo">退出登录</div>
@@ -32,9 +34,23 @@
 export default {
   data () {
     return {
+      dpMsg: null,
+      kefuMsg: null
     }
   },
+  mounted () {
+    this.$root._thatMe = this
+    this.initMsg()
+  },
   methods: {
+    initMsg () {
+      if (this.$root.dpMsg) {
+        this.dpMsg = this.$root.dpMsg
+      }
+      if (this.$root.kefuMsg) {
+        this.kefuMsg = this.$root.kefuMsg
+      }
+    },
     htx () {
       var formData = new FormData()
       formData.append('file', this.$refs.file.files[0])
@@ -50,6 +66,21 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.right{
+        @px: 20px;
+        text-align: center;
+        line-height: 20px;
+        color:#fff;
+        width: @px;
+        height: @px;
+        position: absolute;
+        top:50%;
+        transform: translateY(-50%);
+        right: 0.5rem;
+        font-size: 14px;
+        background: red;
+        border-radius: 50%;
+      }
   h3{
     display: inline-block;
     font-size: 30px;
@@ -76,5 +107,6 @@ export default {
     line-height: 40px;
     background-color: #fff;
     border-radius: 12px;
+    position: relative;
   }
 </style>

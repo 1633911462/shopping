@@ -14,8 +14,12 @@
     <router-link to="/shopOrder">
       <div class="blo">店铺订单</div>
     </router-link>
-    <div class="blo">店铺消息</div>
-    <div class="blo">联系客服</div>
+    <router-link to="/dpMsg">
+      <div class="blo">店铺消息<p class="right" v-if="msgNum">{{msgNum}}</p></div>
+    </router-link>
+    <router-link to="/chat?root=true&dp=true">
+      <div class="blo">联系客服</div>
+    </router-link>
     <!-- 遮罩层 -->
     <div class="zz" ref="zz"></div>
     <!-- 添加商品 -->
@@ -59,6 +63,7 @@ export default {
       index: true,
       num: 0,
       img: [],
+      msgNum: null,
       formData: {
         name: '',
         jg: '',
@@ -75,10 +80,17 @@ export default {
       this.$router.push('/apply')
       return ''
     } else {
+      this.$root._that = this
+      this.initMsg()
       this.getDp()
     }
   },
   methods: {
+    initMsg () {
+      if (this.$root.dpMsg) {
+        this.msgNum = this.$root.dpMsg
+      }
+    },
     // 选择图片
     addImg () {
       var file = this.$refs.file
@@ -145,6 +157,22 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.right{
+        @px: 20px;
+        text-align: center;
+        line-height: 20px;
+        color:#fff;
+        width: @px;
+        height: @px;
+        position: absolute;
+        top:50%;
+        transform: translateY(-50%);
+        opacity: 1;
+        right: 1rem;
+        font-size: 14px;
+        background: red;
+        border-radius: 50%;
+      }
   @width: 100%;
   .file1{
     opacity: 0;
@@ -252,6 +280,7 @@ export default {
     line-height: 40px;
     background-color: #fff;
     border-radius: 12px;
+    position: relative;
   }
   a{
     color: #000;

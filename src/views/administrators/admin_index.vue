@@ -37,14 +37,14 @@ export default {
           class: 'd',
           title: '店铺审核',
           content: '店铺审核通知，请及时查看',
-          src: '/dpMsg',
+          src: '/dpSh',
           msg: ''
         },
         {
           class: 'e',
           title: '用户消息',
           content: '您有新的消息，请及时查看',
-          src: '',
+          src: '/service',
           msg: ''
         },
         {
@@ -70,7 +70,16 @@ export default {
     }
     this.getList()
   },
+  mounted () {
+    this.$root._thatMe = this
+    this.initMsg()
+  },
   methods: {
+    initMsg () {
+      if (this.$root.kefuMsg) {
+        this.block[3].msg = this.$root.kefuMsg
+      }
+    },
     getList () {
       this.axios.get(`${this.ip}/examine?type=dp`)
         .then(i => {

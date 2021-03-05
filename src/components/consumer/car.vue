@@ -147,7 +147,6 @@ export default {
                 return 1
               }
             })
-            console.log(this.list)
           })
       } else {
         setTimeout(() => {

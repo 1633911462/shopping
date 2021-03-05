@@ -1,7 +1,7 @@
 var mixin = {
   data () {
     return {
-      ip: 'http://175.24.126.252:7000'
+      ip: 'http://120.25.215.239:7000'
     }
   },
   methods: {
@@ -59,19 +59,26 @@ var mixin = {
       return data
     },
     // 店铺信息
-    getDp () {
+    async getDp () {
       if (this.$store.state.me.user) {
-        this.axios.post(`${this.ip}/myDp`, {
-          user: this.$store.state.me.user
-        })
-          .then(i => {
-            this.$store.commit('addmyDp', i.data)
-            this.dpName = i.data.dpName
-            this.type = i.data.type.split('，')
-            if (this.type.length === 1) {
-              this.type = i.data.type.split(',')
-            }
+        await new Promise((resolve, reject) => {
+          this.axios.post(`${this.ip}/myDp`, {
+            user: this.$store.state.me.user
           })
+            .then(i => {
+              if (i.data) {
+                this.$store.commit('addmyDp', i.data)
+                this.dpName = i.data.dpName
+                this.type = i.data.type.split('，')
+                if (this.type.length === 1) {
+                  this.type = i.data.type.split(',')
+                }
+                resolve('成功')
+              } else {
+                resolve('暂未开通店铺')
+              }
+            })
+        })
       } else {
         setTimeout(() => {
           this.getDp()
