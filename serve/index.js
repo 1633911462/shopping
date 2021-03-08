@@ -16,7 +16,7 @@ const objectId = require('mongodb').ObjectId;
 const url = 'mongodb://120.25.215.239:27017';
 const bodyParser = require('body-parser')
 const nodemail = require('./nodemailer.js')
-const Imgip = 'http://120.25.215.239/uploads/'
+const Imgip = 'http://120.25.215.239:7000/uploads/'
 app.use(bodyParser.json())
 app.use('/uploads',express.static(__dirname + '/uploads'))
 const multer = require('multer')

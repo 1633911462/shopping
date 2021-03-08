@@ -181,7 +181,6 @@ const routes = [
 
 const router = new VueRouter({
   routes,
-  mode: 'history'
 })
 router.beforeEach((to, from, next) => {
   // 返回到登录页面时
